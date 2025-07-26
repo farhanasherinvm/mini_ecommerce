@@ -49,9 +49,19 @@ class AddCategory(GenericAPIView):
     permission_classes = [IsAdminUser]
     def post(self, request):
         category = CategoryModelSerialization(data=request.data)
-        category.is_valid(raise_exception=True)
-        category.save()
-        return Response(category.data)
+        if category.is_valid():
+            category.save()
+            return Response({
+                "status": "success",
+                "message": "Added a new category!",
+                "data": category.data
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "status": "failed",
+                "message": "failed to add category",
+                "error": category.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 # List all categories
 class ListCategories(GenericAPIView):
@@ -59,7 +69,19 @@ class ListCategories(GenericAPIView):
     def get(self, request):
         categories = CategoryModel.objects.all()
         serializer = CategoryModelSerialization(categories, many=True)
-        return Response(serializer.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "status": "success",
+                "message": "Fetched all available categories from the cart",
+                "data": serializer.data
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "status": "failed",
+                "message": "failed to fetch categories",
+                "error": serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 # Products Adding
 class ProductAdd(GenericAPIView):
@@ -70,10 +92,20 @@ class ProductAdd(GenericAPIView):
         # print(category)
         # request.data['category'] = category.name
         serializer = ProductModelSerialization(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        # print(serializer)
-        serializer.save()
-        return Response(serializer.data)
+        if serializer.is_valid():
+            # print(serializer)
+            serializer.save()
+            return Response({
+                "status":"success",
+                "message":"Product added to the table",
+                "data":serializer.data
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "status":"failed",
+                "message":"failed to add product",
+                "error":serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 # Products retrieving
 class ProductsList(GenericAPIView):
@@ -95,7 +127,20 @@ class ProductDetail(GenericAPIView):
     def get(self, request, id):
         product = ProductModel.objects.get(id=id)
         serializer = ProductModelSerialization(product)
-        return Response(serializer.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "status":"success",
+                "message":"Fetched the product",
+                "data":serializer.data
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "status":"failed",
+                "message":"failed to fetch the product",
+                "error":serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
 
     def patch(self, request, id):
         product = ProductModel.objects.get(id=id)
@@ -105,9 +150,17 @@ class ProductDetail(GenericAPIView):
         )
         if obj.is_valid():
             obj.save()
-            return Response("Product updated successfully!")
+            return Response({
+                "status":"success",
+                "message":"Product updated successfully!",
+                "data":obj.data
+            }, status=status.HTTP_200_OK)
         else:
-            return Response("Failed to update the product")
+            return Response({
+                "status":"failed",
+                "message":"Failed to update the product",
+                "error":obj.errors
+            })
 
     def delete(self, request, id):
         product = ProductModel.objects.filter(id=id)
@@ -122,9 +175,19 @@ class AddCart(GenericAPIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
         cart = CartModelSerialization(data=request.data)
-        cart.is_valid(raise_exception=True)
-        cart.save()
-        return Response({"message":"Cart added successfully!"})
+        if cart.is_valid():
+            cart.save()
+            return Response({
+                "status":"success",
+                "message":"Cart added successfully!",
+                "data":cart.data
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response({
+                "status":"Failed",
+                "message":"Failed to add the cart",
+                "error":cart.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 # Get Carts
 class CartDetails(GenericAPIView):
@@ -132,7 +195,19 @@ class CartDetails(GenericAPIView):
     def get(self, request):
         carts = CartModel.objects.all()
         serializer = CartModelSerialization(carts, many=True)
-        return Response(serializer.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "status":"success",
+                "message":"Fetched all data from the cart",
+                "data":serializer.data
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "status":"failed",
+                "message":"failed to fetch cart datas",
+                "error":serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, id):
         cartItem = CartModel.objects.get(id=id)
@@ -142,16 +217,24 @@ class CartDetails(GenericAPIView):
         )
         if obj.is_valid():
             obj.save()
-            return Response("Cart item updated successfully!")
+            return Response({
+                "status":"success",
+                "message":"Cart item updated successfully!",
+                "data":obj.data
+            }, status=status.HTTP_200_OK)
         else:
-            return Response("Failed to update the cart")
+            return Response({
+                "status":"failed",
+                "message":"Failed to update the cart",
+                "error":obj.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, id):
         cartItem = CartModel.objects.filter(id=id)
         if not cartItem:
-            return Response({"Error":"Cart item not found"})
+            return Response({"Error":"Cart item not found"}, status=status.HTTP_400_BAD_REQUEST)
         cartItem.delete()
-        return Response({"Message":"Cart deleted successfully!"})
+        return Response({"Message":"Cart deleted successfully!"}, status=status.HTTP_200_OK)
 
 
 

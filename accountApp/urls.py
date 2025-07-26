@@ -7,6 +7,7 @@ urlpatterns = [
     path("UserLogoutView/", views.UserLogoutView.as_view()),
 
     path("AddCategory/", views.AddCategory.as_view()),
+    path("ListCategories/", views.ListCategories.as_view()),
     path("ProductAdd/", views.ProductAdd.as_view()),
     path("ProductsList/", views.ProductsList.as_view()),
     path("ProductDetail/<int:id>/", views.ProductDetail.as_view()),
