@@ -6,7 +6,7 @@ class UserSerialization(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = "__all__"
+        fields = ('id','username','phone', 'email','confirmpassword')
 
     def validate(self, attrs):
         if attrs['password'] != attrs['confirmpassword']:
@@ -27,13 +27,29 @@ class UserSerialization(serializers.ModelSerializer):
 class CategoryModelSerialization(serializers.ModelSerializer):
     class Meta:
         model = CategoryModel
-        fields = "__all__"
+        fields = ('id', 'name')
+
 class ProductModelSerialization(serializers.ModelSerializer):
+    category = CategoryModelSerialization(read_only=True)
+
+    cat_id = serializers.PrimaryKeyRelatedField(
+        queryset=CategoryModel.objects.all(), write_only=True, source='category'
+    )
     class Meta:
         model = ProductModel
-        fields = "__all__"
+        fields = ('cat_id','id', 'name', 'price','description', 'stock', 'category')
 
 class CartModelSerialization(serializers.ModelSerializer):
+    user = UserSerialization(read_only=True)
+    product = ProductModelSerialization(read_only=True)
+
+    # These are used when creating/updating
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), write_only=True, source='user'
+    )
+    product_id = serializers.PrimaryKeyRelatedField(
+        queryset=ProductModel.objects.all(), write_only=True, source='product'
+    )
     class Meta:
         model = CartModel
         fields = "__all__"

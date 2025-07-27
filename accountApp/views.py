@@ -69,19 +69,12 @@ class ListCategories(GenericAPIView):
     def get(self, request):
         categories = CategoryModel.objects.all()
         serializer = CategoryModelSerialization(categories, many=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                "status": "success",
-                "message": "Fetched all available categories from the cart",
-                "data": serializer.data
-            }, status=status.HTTP_200_OK)
-        else:
-            return Response({
-                "status": "failed",
-                "message": "failed to fetch categories",
-                "error": serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            "status": "success",
+            "message": "Fetched all available categories from the cart",
+            "data": serializer.data
+        }, status=status.HTTP_200_OK)
 
 # Products Adding
 class ProductAdd(GenericAPIView):
@@ -127,19 +120,12 @@ class ProductDetail(GenericAPIView):
     def get(self, request, id):
         product = ProductModel.objects.get(id=id)
         serializer = ProductModelSerialization(product)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                "status":"success",
-                "message":"Fetched the product",
-                "data":serializer.data
-            }, status=status.HTTP_200_OK)
-        else:
-            return Response({
-                "status":"failed",
-                "message":"failed to fetch the product",
-                "error":serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            "status":"success",
+            "message":"Fetched the product",
+            "data":serializer.data
+        }, status=status.HTTP_200_OK)
 
 
     def patch(self, request, id):
@@ -193,21 +179,14 @@ class AddCart(GenericAPIView):
 class CartDetails(GenericAPIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
-        carts = CartModel.objects.all()
+        carts = CartModel.objects.filter(user=request.user)
         serializer = CartModelSerialization(carts, many=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                "status":"success",
-                "message":"Fetched all data from the cart",
-                "data":serializer.data
-            }, status=status.HTTP_200_OK)
-        else:
-            return Response({
-                "status":"failed",
-                "message":"failed to fetch cart datas",
-                "error":serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            "status":"success",
+            "message":"Fetched all data from the cart",
+            "data":serializer.data
+        }, status=status.HTTP_200_OK)
 
     def patch(self, request, id):
         cartItem = CartModel.objects.get(id=id)
