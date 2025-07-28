@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser, AllowAny
 
 from django.contrib.auth.models import User
 
@@ -48,9 +49,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
 
     def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [permissions.IsAdminUser()]
-        return [permissions.AllowAny()]
+        if self.request.method in ['POST', 'PUT', 'PATCH', 'DELETE']:
+            return [IsAdminUser()]
+        return [AllowAny()]
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
@@ -59,15 +60,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 #  Product API
 # ================================
-
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
     def get_permissions(self):
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
-            return [permissions.IsAdminUser()]
-        return [permissions.AllowAny()]
+        if self.request.method in ['POST', 'PUT', 'PATCH', 'DELETE']:
+            return [IsAdminUser()]
+        return [AllowAny()]
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
