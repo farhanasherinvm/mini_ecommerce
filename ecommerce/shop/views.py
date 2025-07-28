@@ -10,8 +10,8 @@ from .models import Category, Product, Cart
 from .serializers import CategorySerializer, ProductSerializer, CartSerializer
 
 
-# ================================
-# 🔐 Register API
+
+# Register API
 # ================================
 
 class RegisterView(APIView):
@@ -39,8 +39,8 @@ class RegisterView(APIView):
         }, status=status.HTTP_201_CREATED)
 
 
-# ================================
-# 📂 Category API
+
+#  Category API
 # ================================
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -57,8 +57,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return Response({'message': 'Category created', 'data': response.data}, status=status.HTTP_201_CREATED)
 
 
-# ================================
-# 📦 Product API
+#  Product API
 # ================================
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -99,8 +98,8 @@ class ProductViewSet(viewsets.ModelViewSet):
         return Response({'message': 'Product deleted'}, status=status.HTTP_204_NO_CONTENT)
 
 
-# ================================
-# 🛒 Cart API
+
+#  Cart API
 # ================================
 
 class CartViewSet(viewsets.ModelViewSet):
