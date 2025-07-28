@@ -27,10 +27,24 @@ class LoginView(GenericAPIView):
 
         if user:
             refresh = RefreshToken.for_user(user)
-            return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            })
+            access_token = str(refresh.access_token)
+            refresh_token = str(refresh)
+            response = Response({
+                "message":"User logged in successfully",
+                'access': str(access_token)
+            }, status=status.HTTP_200_OK)
+
+            # Set refresh token in HttpOnly cookie
+            response.set_cookie(
+                key='refresh_token',
+                value=refresh_token,
+                max_age=86400, #1 day  #the number of seconds until the cookie expires
+                secure=True, #the cookie will only be sent over HTTPS connections
+                httponly=True,
+                samesite='Lax'
+            )
+            return response
+
         return Response({'error': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class UserLogoutView(GenericAPIView):
