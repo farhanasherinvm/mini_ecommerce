@@ -192,6 +192,8 @@ class AddCart(GenericAPIView):
 # Get Carts
 class CartDetails(GenericAPIView):
     permission_classes = [IsAuthenticated]
+
+    # get all available details from cart
     def get(self, request):
         carts = CartModel.objects.filter(user=request.user)
         serializer = CartModelSerialization(carts, many=True)
@@ -202,8 +204,19 @@ class CartDetails(GenericAPIView):
             "data":serializer.data
         }, status=status.HTTP_200_OK)
 
+    # Get each product from cart
+    def get(self, request, id):
+        carts = CartModel.objects.filter(id=id, user=request.user)
+        serializer = CartModelSerialization(carts, many=True)
+
+        return Response({
+            "status":"success",
+            "message":"Fetched all data from the cart",
+            "data":serializer.data
+        }, status=status.HTTP_200_OK)
+
     def patch(self, request, id):
-        cartItem = CartModel.objects.get(id=id)
+        cartItem = CartModel.objects.get(id=id, user=request.user)
         obj = CartModelSerialization(
             instance=cartItem,  # the record to update
             data=request.data  # incoming new values
@@ -223,7 +236,7 @@ class CartDetails(GenericAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, id):
-        cartItem = CartModel.objects.filter(id=id)
+        cartItem = CartModel.objects.filter(id=id, user=request.user)
         if not cartItem:
             return Response({"Error":"Cart item not found"}, status=status.HTTP_400_BAD_REQUEST)
         cartItem.delete()
